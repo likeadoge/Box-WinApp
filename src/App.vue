@@ -1,29 +1,34 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+  <div id="app-view">
+    <e-loading />
+    <e-main v-if="loginStatus" />
+    <e-login v-else />
   </div>
 </template>
+<script>
+import ELoading from "./view/ELoading";
+import ELogin from "./view/ELogin";
+import EMain from "./view/EMain"
+import {mapGetters} from 'vuex'
 
-<script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import HelloWorld from './components/HelloWorld.vue';
-
-@Component({
-  components: {
-    HelloWorld,
+export default {
+  components: { ELogin,EMain ,ELoading},
+  computed:{
+    ...mapGetters(['loginStatus'])
   },
-})
-export default class App extends Vue {}
+  data() {
+    return {
+      collapsed: false,
+      nodeVer: process.version,
+    };
+  }
+};
 </script>
 
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+<style  lang="scss" scoped>
+#app-view{
+    height: 100%;
+    width: 100%;
+    position: relative;
 }
 </style>

@@ -1,89 +1,134 @@
-'use strict'
+import { app, protocol, BrowserWindow, Menu, ipcMain, Tray } from 'electron'
+import address from 'address'
+import path from 'path'
+import fs from 'fs'
 
-import { app, protocol, BrowserWindow } from 'electron'
 import {
-  createProtocol,
-  /* installVueDevtools */
+    createProtocol,
+    installVueDevtools // 无法连接 chrome 商店，需要梯子
 } from 'vue-cli-plugin-electron-builder/lib'
+
+
+// 静态文件地址
+declare const __static: string
+
+
+// 加载 config
+const config = JSON.parse(fs.readFileSync(path.resolve(__static, './config.json')).toString()) as {
+    baseURL: "string"
+}
+
+ipcMain.on('config', function (event, arg) {
+    event.returnValue = config;
+});
+
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let win: BrowserWindow | null
+let win: BrowserWindow | null = null
+//托盘对象
+let appTray: Tray | null = null;
 
 // Scheme must be registered before the app is ready
-protocol.registerSchemesAsPrivileged([{scheme: 'app', privileges: { secure: true, standard: true } }])
+protocol.registerSchemesAsPrivileged([{
+    scheme: 'app',
+    privileges: {
+        secure: true,
+        standard: true
+    }
+}])
 
-function createWindow () {
-  // Create the browser window.
-  win = new BrowserWindow({ width: 800, height: 600, webPreferences: {
-    nodeIntegration: true
-  } })
+console.log(address.ipv6())
 
-  if (process.env.WEBPACK_DEV_SERVER_URL) {
-    // Load the url of the dev server if in development mode
-    win.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string)
-    if (!process.env.IS_TEST) win.webContents.openDevTools()
-  } else {
-    createProtocol('app')
-    // Load the index.html when not in development
-    win.loadURL('app://./index.html')
-  }
+function createWindow() {
+    // Create the browser window.
+    Menu.setApplicationMenu(null)
 
-  win.on('closed', () => {
-    win = null
-  })
+    appTray = new Tray(path.join(__static, './favicon.ico'));//app.ico是app目录下的ico文件
+
+    //图标的上下文菜单
+    const contextMenu = Menu.buildFromTemplate([{
+        label: '打开',
+        click: function () {
+            win && win.show()
+        }
+    }, {
+        label: '隐藏',
+        click: function () {
+            win && win.hide()
+        }
+    }, {
+        label: '退出',
+        click: function () {
+            win&&win.destroy()
+        }
+    }])
+    appTray.setToolTip('交换中心')
+    appTray.setContextMenu(contextMenu)
+    appTray.on('click', () => { //我们这里模拟桌面程序点击通知区图标实现打开关闭应用的功能
+        win && win.show()
+    })
+
+    win = new BrowserWindow({
+        minWidth: 1080,
+        minHeight: 600,
+        width: 1080,
+        height: 768,
+        webPreferences: {
+            nodeIntegration: true,
+            webSecurity: false
+        }
+    })
+
+    win.on('close', (event) => {
+        win && win.hide();
+        win && win.setSkipTaskbar(true);
+        event.preventDefault();
+    });
+
+    if (process.env.WEBPACK_DEV_SERVER_URL) {
+        win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
+        if (!process.env.IS_TEST) win.webContents.openDevTools()
+    } else {
+        createProtocol('app')
+        // Load the index.html when not in development
+        win.loadURL('app://./index.html')
+    }
+
+    win.on('closed', () => {
+        win = null
+    })
 }
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
-  // On macOS it is common for applications and their menu bar
-  // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
+    if (process.platform !== 'darwin') {
+        app.quit()
+    }
 })
 
 app.on('activate', () => {
-  // On macOS it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  if (win === null) {
-    createWindow()
-  }
+    if (win === null) {
+        createWindow()
+    }
 })
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
 app.on('ready', async () => {
-  if (isDevelopment && !process.env.IS_TEST) {
-    // Install Vue Devtools
-    // Devtools extensions are broken in Electron 6.0.0 and greater
-    // See https://github.com/nklayman/vue-cli-plugin-electron-builder/issues/378 for more info
-    // Electron will not launch with Devtools extensions installed on Windows 10 with dark mode
-    // If you are not using Windows 10 dark mode, you may uncomment these lines
-    // In addition, if the linked issue is closed, you can upgrade electron and uncomment these lines
-    // try {
-    //   await installVueDevtools()
-    // } catch (e) {
-    //   console.error('Vue Devtools failed to install:', e.toString())
-    // }
-
-  }
-  createWindow()
+    createWindow()
 })
 
 // Exit cleanly on request from parent process in development mode.
 if (isDevelopment) {
-  if (process.platform === 'win32') {
-    process.on('message', data => {
-      if (data === 'graceful-exit') {
-        app.quit()
-      }
-    })
-  } else {
-    process.on('SIGTERM', () => {
-      app.quit()
-    })
-  }
+    if (process.platform === 'win32') {
+        process.on('message', data => {
+            if (data === 'graceful-exit') {
+                app.quit()
+            }
+        })
+    } else {
+        process.on('SIGTERM', () => {
+            app.quit()
+        })
+    }
 }
