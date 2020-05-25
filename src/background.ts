@@ -9,23 +9,24 @@ import {
 } from 'vue-cli-plugin-electron-builder/lib'
 
 
+console.log(address.ip())
+
 // 静态文件地址
 declare const __static: string
-
 
 // 加载 config
 const config = JSON.parse(fs.readFileSync(path.resolve(__static, './config.json')).toString()) as {
     baseURL: "string"
 }
+const isDevelopment = process.env.NODE_ENV !== 'production'
+
 
 ipcMain.on('config', function (event, arg) {
     event.returnValue = config;
 });
 
-const isDevelopment = process.env.NODE_ENV !== 'production'
 
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
+// Keep a global reference of the window object
 let win: BrowserWindow | null = null
 //托盘对象
 let appTray: Tray | null = null;
@@ -39,7 +40,6 @@ protocol.registerSchemesAsPrivileged([{
     }
 }])
 
-console.log(address.ipv6())
 
 function createWindow() {
     // Create the browser window.
