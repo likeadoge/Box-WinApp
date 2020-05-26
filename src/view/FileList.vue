@@ -115,6 +115,11 @@ export default {
           dataIndex: "createTime",
         },
         {
+          title: "加密码",
+          align: "left",
+          dataIndex: "randomCode",
+        },
+        {
           title: "操作",
           key: "action",
           width: 120,
