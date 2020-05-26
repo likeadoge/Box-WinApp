@@ -20,16 +20,17 @@ const config = JSON.parse(fs.readFileSync(path.resolve(__static, './config.json'
 }
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
+const gotTheLock = app.requestSingleInstanceLock()
 
 ipcMain.on('config', function (event, arg) {
     event.returnValue = config;
 });
 
-
 // Keep a global reference of the window object
 let win: BrowserWindow | null = null
 //托盘对象
 let appTray: Tray | null = null;
+
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([{
@@ -61,7 +62,7 @@ function createWindow() {
     }, {
         label: '退出',
         click: function () {
-            win&&win.destroy()
+            win && win.destroy()
         }
     }])
     appTray.setToolTip('交换中心')
@@ -101,34 +102,48 @@ function createWindow() {
     })
 }
 
-// Quit when all windows are closed.
-app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
-        app.quit()
-    }
-})
 
-app.on('activate', () => {
-    if (win === null) {
-        createWindow()
-    }
-})
+if (!gotTheLock) {
+    app.quit()
+} else {
 
-app.on('ready', async () => {
-    createWindow()
-})
+    app.on('second-instance', (event, commandLine, workingDirectory) => {
+        win && win.show()
+        win && win.isMinimized() && win.restore()
+        win && win.focus()
+    })
 
-// Exit cleanly on request from parent process in development mode.
-if (isDevelopment) {
-    if (process.platform === 'win32') {
-        process.on('message', data => {
-            if (data === 'graceful-exit') {
-                app.quit()
-            }
-        })
-    } else {
-        process.on('SIGTERM', () => {
+
+    // Quit when all windows are closed.
+    app.on('window-all-closed', () => {
+        if (process.platform !== 'darwin') {
             app.quit()
-        })
+        }
+    })
+
+    app.on('activate', () => {
+        if (win === null) {
+            createWindow()
+        }
+    })
+
+    app.on('ready', async () => {
+        createWindow()
+    })
+
+    // Exit cleanly on request from parent process in development mode.
+    if (isDevelopment) {
+        if (process.platform === 'win32') {
+            process.on('message', data => {
+                if (data === 'graceful-exit') {
+                    app.quit()
+                }
+            })
+        } else {
+            process.on('SIGTERM', () => {
+                app.quit()
+            })
+        }
     }
+
 }
