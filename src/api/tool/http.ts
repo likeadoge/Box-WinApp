@@ -100,25 +100,31 @@ const delay = <T>(timeout: number) => (arg: T) => {
  * @param url
  * @param parameter
  * @returns {*}
- */
+*/
+
 export function file(url: string, parameter: any, name: string) {
     // const src = baseURL +url +"?"+ Object.keys(parameter).map(key=>{
     //     const v = parameter[key]
     //     return `${key}=${v}`
     // }).join('&')
 
-    store.dispatch('LoadingBegin', '正在下载中')
+    const loadingTimeout = setTimeout(() => {
+        store.dispatch('LoadingBegin', '正在下载中')
+    }, 500);
 
     return axios({
         url: url,
         method: 'get',
         params: parameter,
         responseType: 'blob'
-    }).then(delay(0)).then((...arg) => {
-        convertRes2Blob(arg[0], name)
-    }).finally(()=>{
-        store.dispatch('LoadingEnd')
     })
+        .then(delay(0))
+        .then((...arg) => {
+            convertRes2Blob(arg[0], name)
+        }).finally(() => {
+            if (loadingTimeout) { clearTimeout(loadingTimeout) }
+            store.dispatch('LoadingEnd')
+        })
 }
 
 
