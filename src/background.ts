@@ -16,7 +16,8 @@ declare const __static: string
 
 // 加载 config
 const config = JSON.parse(fs.readFileSync(path.resolve(__static, './config.json')).toString()) as {
-    baseURL: "string"
+    baseURL: string,
+    domianURL: string
 }
 const isDevelopment = process.env.NODE_ENV !== 'production'
 

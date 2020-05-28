@@ -1,9 +1,17 @@
 <template>
   <a-layout id="main">
     <a-layout-header class="header">
-      <div
-        class="logo"
-      >欢迎进入综合办公平台 - 交换中心</div>
+      <div class="logo">欢迎进入综合办公平台 - 交换中心</div>
+      <a-menu
+        theme="dark"
+        mode="horizontal"
+        v-model="pageIndex"
+        :style="{ lineHeight: '64px' ,float:'left'}"
+      >
+        <a-menu-item key="0"><a-icon type="import" />文件导入</a-menu-item>
+        <a-menu-item key="1"><a-icon type="export" />文件导出</a-menu-item>
+      </a-menu>
+
       <a-menu
         theme="dark"
         mode="horizontal"
@@ -23,21 +31,11 @@
           <a-breadcrumb-item>App</a-breadcrumb-item>
         </a-breadcrumb>-->
         <a-layout-content
-          :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px',overflow:'auto' }"
+          :style="{ margin: 0, minHeight: '280px',overflow:'auto' }"
         >
-        <!-- Node Version: {{nodeVer}} -->
-          <file-list></file-list>
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+          <!-- Node Version: {{nodeVer}} -->
+          <download-list  v-show="pageIndex.findIndex(v=>v==='1') >=0"/>
+          <upload-list  v-show="pageIndex.findIndex(v=>v==='0') >=0"/>
         </a-layout-content>
       </a-layout>
     </a-layout>
@@ -45,14 +43,16 @@
 </template>
 <script>
 import { mapActions } from "vuex";
-import FileList from './FileList'
+import DownloadList from "./DownloadList";
+import UploadList from "./upload/UploadList";
 
 export default {
-  components:{FileList},
+  components: { DownloadList,UploadList },
   data() {
     return {
       collapsed: false,
-      nodeVer: process.version
+      nodeVer: process.version,
+      pageIndex: ["0"]
     };
   },
   methods: {
@@ -74,9 +74,10 @@ export default {
   .logo {
     line-height: 64px;
     float: left;
-    color: rgba(255, 255, 255,0.95);
+    color: rgba(255, 255, 255, 0.95);
     font-size: 16px;
     margin-left: -24px;
+    margin-right: 24px;
     font-weight: bolder;
     text-shadow: 0 2px 3px rgba(255, 255, 255, 0.4);
   }

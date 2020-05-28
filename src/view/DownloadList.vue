@@ -1,5 +1,5 @@
 <template>
-  <div class="components-form-demo-advanced-search">
+  <com-page class="components-form-demo-advanced-search">
     <a-form-model class="ant-advanced-search-form">
       <a-row :gutter="24">
         <a-col :span="7">
@@ -59,15 +59,16 @@
         </template>
       </common-table>
     </div>
-  </div>
+  </com-page>
 </template>
 <script>
 import moment from "moment";
 import CommonTable from "./ComTable";
 import * as http from "../api/tool/http";
+import ComPage from './ComPage'
 
 export default {
-  components: { CommonTable },
+  components: { CommonTable ,ComPage},
   data() {
     return {
       labelCol: { span: 6 },
@@ -175,7 +176,6 @@ export default {
 .components-form-demo-advanced-search .ant-form {
   max-width: none;
 }
-
 .components-form-demo-advanced-search .search-result-list {
   flex: 1;
   position: relative;

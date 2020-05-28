@@ -22,7 +22,8 @@ export default new Vuex.Store<{
     loginStatus(state) { return state.user.token === null ? false : true },
     globeLoading(state) {
       return state.loading === null ? { status: false, text: '' } : { status: true, text: state.loading }
-    }
+    },
+    userToken(state) { return state.user.token }
   },
   mutations: {
     SET_TOKEN: (state, token: string) => {

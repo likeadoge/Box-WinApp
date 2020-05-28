@@ -1,3 +1,4 @@
 {
-    "baseURL":"http://192.168.111.5:8080/dmbox-boot"
+    "baseURL":"http://192.168.111.5:8080/dmbox-boot",
+    "domianURL":"http://192.168.111.5:8080/dmbox-boot"
 }

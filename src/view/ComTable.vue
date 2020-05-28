@@ -100,6 +100,7 @@ export default {
         this.ipagination.current = 1;
       }
       const params = this.getQueryParams(); //查询条件
+
       this.loading = true;
       // console.info(this.url.list)
       http
@@ -111,7 +112,7 @@ export default {
               res.total
             ])
         )
-        .catch(e => this.$message.warning(e))
+        .catch(msg => this.$message.warning(msg||"出现错误！"))
         .finally(() => (this.loading = false));
     },
     handleTableChange(pagination, filters, sorter) {
