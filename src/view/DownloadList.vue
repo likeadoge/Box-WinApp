@@ -65,10 +65,10 @@
 import moment from "moment";
 import CommonTable from "./ComTable";
 import * as http from "../api/tool/http";
-import ComPage from './ComPage'
+import ComPage from "./ComPage";
 
 export default {
-  components: { CommonTable ,ComPage},
+  components: { CommonTable, ComPage },
   data() {
     return {
       labelCol: { span: 6 },
@@ -113,12 +113,12 @@ export default {
         {
           title: "提交时间",
           align: "left",
-          dataIndex: "createTime",
+          dataIndex: "createTime"
         },
         {
           title: "加密码",
           align: "left",
-          dataIndex: "randomCode",
+          dataIndex: "randomCode"
         },
         {
           title: "操作",
@@ -144,11 +144,13 @@ export default {
     moment,
     download(r) {
       const { id, type, fileName } = r;
-      http.file(
-        "/manage/shareFileRecord/downloadZipFile",
-        { id, type },
-        fileName + ".zip"
-      );
+      http
+        .file(
+          "/manage/shareFileRecord/downloadZipFile",
+          { id, type },
+          fileName + ".zip"
+        )
+        .then(() => this.$message.success("下载成功！"));
     },
     toggle() {
       this.expand = !this.expand;

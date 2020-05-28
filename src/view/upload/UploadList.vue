@@ -1,6 +1,6 @@
 <template>
   <div :style="{height:'100%',display: 'flex',flexDirection: 'row'}">
-    <com-page :style="{width:'280px',marginRight:'24px'}">
+    <com-page :style="{width:'280px',marginRight:'16px'}">
       <upload-list-tree
         ref="tree"
         :parentId="queryParam.parentId "
@@ -66,6 +66,7 @@ export default {
         {
           title: "修改日期",
           align: "left",
+          width:160,
           dataIndex: "updateTime",
           sorter: true
           // customRender: function (text) {
@@ -77,6 +78,7 @@ export default {
           align: "left",
           sorter: true,
           dataIndex: "fileSize",
+          width:160,
           customRender(fileByte) {
             if (!fileByte) return "";
             const fileSizeByte = fileByte;
