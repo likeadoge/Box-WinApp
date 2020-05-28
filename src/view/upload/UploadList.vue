@@ -12,7 +12,9 @@
     <com-page :style="{flex:'1',display:'flex',flexDirection: 'column'}">
       <a-form-model>
         <a-row :gutter="24" :style="{display:'flex'}">
-          <a-col :style="{ flex:'1',lineHeight:'40px'}">{{'/ '+dirRoute.map(v=>v.title).join(' / ')}}</a-col>
+          <a-col
+            :style="{ flex:'1',lineHeight:'40px'}"
+          >{{'/ '+dirRoute.map(v=>v.title).join(' / ')}}</a-col>
           <a-col :style="{ textAlign: 'right' ,paddingTop:'3px',float:'right'}">
             <a-form-item :style="{float:'left',marginRight:'24px',marginTop:'-4px'}">
               <a-input v-model="queryParam.fileName" placeholder="请输入文件名" />
@@ -30,11 +32,13 @@
           :searchParam="queryParam"
         >
           <template #action="text, record">
-            <a @click="()=>rename(record)">重命名</a>
-            <a-divider type="vertical" />
-            <a @click="()=>move(record)">移动</a>
-            <a-divider type="vertical" />
-            <a @click="()=>del(record)">删除</a>
+            <div v-if="record.type=='1'">
+              <a @click="()=>rename(record)">重命名</a>
+              <a-divider type="vertical" />
+              <a @click="()=>move(record)">移动</a>
+              <a-divider type="vertical" />
+              <a @click="()=>del(record)">删除</a>
+            </div>
           </template>
         </com-table>
       </div>
@@ -66,7 +70,7 @@ export default {
         {
           title: "修改日期",
           align: "left",
-          width:160,
+          width: 160,
           dataIndex: "updateTime",
           sorter: true
           // customRender: function (text) {
@@ -78,7 +82,7 @@ export default {
           align: "left",
           sorter: true,
           dataIndex: "fileSize",
-          width:160,
+          width: 160,
           customRender(fileByte) {
             if (!fileByte) return "";
             const fileSizeByte = fileByte;
