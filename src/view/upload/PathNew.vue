@@ -80,7 +80,7 @@ export default {
             else return Object.assign({}, v);
           });
       }
-      return [ { title: "根目录", value: "", children: filterTree(this.data,this.id) }]
+      return filterTree(this.data,this.id) 
     }
   },
   methods: {

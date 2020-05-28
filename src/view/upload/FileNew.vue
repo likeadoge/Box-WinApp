@@ -86,7 +86,7 @@ export default {
   },
   computed: {
     treeData(){
-      return [ { title: "根目录", value: "", children: this.data }]
+      return  this.data 
     }
   },
   methods: {

@@ -14,7 +14,7 @@
         <a-row :gutter="24" :style="{display:'flex'}">
           <a-col
             :style="{ flex:'1',lineHeight:'40px'}"
-          >{{'/ '+dirRoute.map(v=>v.title).join(' / ')}}</a-col>
+          >{{dirRoute.map(v=>v.title).join(' / ')}}</a-col>
           <a-col :style="{ textAlign: 'right' ,paddingTop:'3px',float:'right'}">
             <a-form-item :style="{float:'left',marginRight:'24px',marginTop:'-4px'}">
               <a-input v-model="queryParam.fileName" placeholder="请输入文件名" />

@@ -1,7 +1,7 @@
 <template>
   <div :style="{height:'100%'}">
     <div style="text-align:center">
-      <a-button @click="addFile" type="primary" icon="plus" style="margin-right:8px">创建目录</a-button>
+      <a-button @click="fileAddFile(parentNode)" type="primary" icon="plus" style="margin-right:8px">创建目录</a-button>
 
       <a-upload
         :multiple="true"
@@ -12,7 +12,7 @@
         :showUploadList="false"
         :fileList="attachList"
       >
-        <a-button type="primary" class="upload-btn" icon="upload" @click="()=>{fileNode = null}">
+        <a-button type="primary" class="upload-btn" icon="upload" @click="()=>{fileNode = parentNode}">
           <span :style="{color:'#fff'}">本地上传</span>
         </a-button>
       </a-upload>
@@ -21,8 +21,7 @@
       show-icon
       style="margin-top:20px"
       :treeData="treeData"
-      :defaultExpandedKeys="defaultExpandedKeys"
-      treeDefaultExpandAll
+      :expandedKeys.sync="expandedKeys"
       :selectedKeys="[parentId]"
       @select="onSelect"
       @expand="onExpand"
@@ -55,15 +54,15 @@
           :fileList="attachList"
         >上传</a-upload>
       </a-menu-item>
-      <a-divider />
-      <a-menu-item @click="()=>fileModifyName(rightClickNode)">
+      <a-divider  v-show="rightClickNode&&rightClickNode.dirData" />
+      <a-menu-item v-show="rightClickNode&&rightClickNode.dirData" @click="()=>fileModifyName(rightClickNode)">
         <span>重命名</span>
       </a-menu-item>
-      <a-menu-item @click="()=>fileModifyPath(rightClickNode)">
+      <a-menu-item v-show="rightClickNode&&rightClickNode.dirData" @click="()=>fileModifyPath(rightClickNode)">
         <span>移动</span>
       </a-menu-item>
-      <a-divider />
-      <a-menu-item @click="fileDelete(rightClickNode)">
+      <a-divider  v-show="rightClickNode&&rightClickNode.dirData" />
+      <a-menu-item  v-show="rightClickNode&&rightClickNode.dirData" @click="fileDelete(rightClickNode)">
         <span>删除</span>
       </a-menu-item>
     </a-menu>
@@ -138,7 +137,8 @@ export default {
   data() {
     return {
       treeData: [],
-      defaultExpandedKeys: [],
+      expandedKeys:[''],
+      defaultExpandedKeys:[],
       rightClickNode: null,
       fileNode: null,
       url: {
@@ -165,7 +165,10 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["userToken"])
+    ...mapGetters(["userToken"]),
+    parentNode(){
+      return getNode(this.treeData,this.parentId) || null
+    }
   },
   mounted() {
     this.headers = { "X-Access-Token": this.userToken };
@@ -173,16 +176,17 @@ export default {
   },
   methods: {
     loadTree() {
-      // 默认展开所有文件夹
-      this.defaultExpandedKeys = [];
       http
         .get(this.url.tree, null)
         .then(result => {
-          this.treeData = result;
+          this.treeData = [result];
           this.treeData.forEach(item => {
             this.defaultExpandedKeys.push(item.key);
+
+            this.expandedKeys = this.expandedKeys.filter(v=>v=='').concat([''])
           });
           addCustomIcon(this.treeData);
+          if(!this.parentId) this.onSelect([''])
         })
         .catch(msg => this.$message.warning(msg || "出现错误！"));
     },
@@ -200,8 +204,7 @@ export default {
     },
 
     onSelect(keys) {
-      // this.loadData();
-      // this.parentId = keys[0];
+      if (keys.length <= 0) return;
       this.rightClickNode = null;
       if (!keys.length) {
         this.breadList = [];
@@ -303,7 +306,7 @@ export default {
     },
 
     fileAddFile(record) {
-      const level = record.dirData.isdir;
+      const level = record.dirData?record.dirData.isdir:0;
       if (level == 2) {
         return this.$message.warning("仅支持三级目录管理！");
       }
