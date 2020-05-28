@@ -2,6 +2,7 @@ import axios from 'axios'
 import { Modal, notification } from 'ant-design-vue'
 import store from 'store';
 import { ipcRenderer } from 'electron'
+import vuexStore from '../../store/index';
 
 const {baseURL} = ipcRenderer.sendSync('config')
 // 创建 axios 实例
@@ -28,10 +29,7 @@ const err = (error: any) => {
                         okText: '重新登录',
                         mask: false,
                         onOk: () => {
-                            //   store.dispatch('Logout').then(() => {
-                            //     Vue.ls.remove(ACCESS_TOKEN)
-                            //     window.location.reload()
-                            //   })
+                           vuexStore.dispatch('Logout')
                         }
                     })
                 } else {
@@ -51,11 +49,7 @@ const err = (error: any) => {
             case 401:
                 notification.error({ message: '系统提示', description: '未授权，请重新登录', duration: 4 })
                 if (token) {
-                    //   store.dispatch('Logout').then(() => {
-                    //     setTimeout(() => {
-                    //       window.location.reload()
-                    //     }, 1500)
-                    //   })
+                    vuexStore.dispatch('Logout')
                 }
                 break
             default:
