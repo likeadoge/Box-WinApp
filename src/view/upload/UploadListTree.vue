@@ -183,7 +183,7 @@ export default {
           this.treeData.forEach(item => {
             this.defaultExpandedKeys.push(item.key);
 
-            this.expandedKeys = this.expandedKeys.filter(v=>v=='').concat([''])
+            this.expandedKeys = this.expandedKeys.filter(v=>v!=='').concat([''])
           });
           addCustomIcon(this.treeData);
           if(!this.parentId) this.onSelect([''])
